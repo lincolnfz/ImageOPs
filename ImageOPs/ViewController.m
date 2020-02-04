@@ -37,6 +37,10 @@
 }
 
 - (IBAction)roationTouchUP:(id)sender {
+    
+}
+
+- (IBAction)binaryTouchUP:(id)sender {
     NSBundle* mainBundle = [NSBundle mainBundle];
     NSString* pic = [mainBundle pathForResource:@"apple" ofType:@"jpeg"];
     //pic = [NSString stringWithFormat:@"%@/apple.jpeg", NSHomeDirectory()];

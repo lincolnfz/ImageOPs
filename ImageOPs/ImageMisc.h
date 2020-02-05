@@ -18,6 +18,7 @@ NSData* getImageNSData(UIImage* image);
 - (nonnull instancetype) initImageMisc;
 - (UIImage*) grayTrans: (UIImage*) srcImg;
 - (UIImage*) binaryTrans: (UIImage*) srcImg Threshold: (NSUInteger) threshold;
+- (UIImage*) roation: (UIImage*) srcImg angle: (NSInteger) angle;
 @end
 
 NS_ASSUME_NONNULL_END

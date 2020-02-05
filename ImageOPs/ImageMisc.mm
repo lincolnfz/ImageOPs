@@ -8,9 +8,12 @@
 
 #import "ImageMisc.h"
 #import <Metal/Metal.h>
+#import "LYShaderTypes.h"
+#import "MetalContext/MetalContext.h"
 
 @interface ImageMisc()
-
+@property (nonatomic, strong) id<MTLBuffer> vertices;
+@property (nonatomic, assign) NSUInteger numVertices;
 @end
 
 @implementation ImageMisc
@@ -18,8 +21,9 @@
     id <MTLDevice> _device;
     id <MTLLibrary> _library;
     id <MTLComputePipelineState> _grayPipelineState; //灰度转换
-    id <MTLComputePipelineState> _roationPipelineState; //角度旋转
+    //id <MTLComputePipelineState> _roationPipelineState; //角度旋转
     id <MTLComputePipelineState> _binaryPipelineState; //二值化
+    id <MTLRenderPipelineState> _randerPipelineState; //渲染管道
     id <MTLCommandQueue> _commandQueue;
 }
 
@@ -175,8 +179,9 @@ NSData* getImageNSData(UIImage* image){
 }
 
 - (nonnull instancetype) initImageMisc {
-    _device = MTLCreateSystemDefaultDevice();
-    _library = [_device newDefaultLibrary];
+    MetalContext* metalCont = [MetalContext shareMetalContext];
+    _device = metalCont.device; //MTLCreateSystemDefaultDevice();
+    _library = metalCont.library;//[_device newDefaultLibrary];
     //_library = [_device newLibraryWithFile:@"ImageMisc.metal" error: &err];
     
     NSError *error = NULL;
@@ -203,9 +208,44 @@ NSData* getImageNSData(UIImage* image){
         return nil;
     }
     
-    _commandQueue = [_device newCommandQueue];
+    [self setupRenderPipeline];
+    [self setupVertex];
+    _commandQueue = metalCont.commandQueue;//[_device newCommandQueue];
     
     return self;
+}
+
+#define RANDER_PIXEL_FORMAT MTLPixelFormatBGRA8Unorm
+
+// 设置渲染管道
+-(void)setupRenderPipeline {
+    id<MTLFunction> vertexFunction = [_library newFunctionWithName:@"vertexShader"]; // 顶点shader，vertexShader是函数名
+    id<MTLFunction> fragmentFunction = [_library newFunctionWithName:@"samplingShader"]; // 片元shader，samplingShader是函数名
+    
+    MTLRenderPipelineDescriptor *pipelineStateDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
+    pipelineStateDescriptor.vertexFunction = vertexFunction;
+    pipelineStateDescriptor.fragmentFunction = fragmentFunction;
+    pipelineStateDescriptor.colorAttachments[0].pixelFormat = RANDER_PIXEL_FORMAT;
+    _randerPipelineState = [_device newRenderPipelineStateWithDescriptor:pipelineStateDescriptor
+                                                                         error:NULL]; // 创建图形渲染管道，耗性能操作不宜频繁调用
+}
+
+//设置顶点
+- (void)setupVertex {
+    static const LYVertex quadVertices[] =
+    {   // 顶点坐标，分别是x、y、z、w；    纹理坐标，x、y；
+        { {  1.0, -1.0, 0.0, 1.0 },  { 1.f, 1.f } },
+        { { -1.0, -1.0, 0.0, 1.0 },  { 0.f, 1.f } },
+        { { -1.0,  1.0, 0.0, 1.0 },  { 0.f, 0.f } },
+        
+        { {  1.0, -1.0, 0.0, 1.0 },  { 1.f, 1.f } },
+        { { -1.0,  1.0, 0.0, 1.0 },  { 0.f, 0.f } },
+        { {  1.0,  1.0, 0.0, 1.0 },  { 1.f, 0.f } },
+    };
+    _vertices = [_device newBufferWithBytes:quadVertices
+                                                 length:sizeof(quadVertices)
+                                                options:MTLResourceStorageModeShared]; // 创建顶点缓存
+    _numVertices = sizeof(quadVertices) / sizeof(LYVertex); // 顶点个数
 }
 
 - (UIImage *)imageFromBRGABytes:(unsigned char *)imageBytes imageSize:(CGSize)imageSize {
@@ -372,6 +412,145 @@ NSData* getImageNSData(UIImage* image){
     free(fthreshold);
     
     return outimg;
+}
+
+- (Byte *)loadImage:(UIImage *)image {
+    // 1获取图片的CGImageRef
+    CGImageRef spriteImage = image.CGImage;
+    
+    // 2 读取图片的大小
+    size_t width = CGImageGetWidth(spriteImage);
+    size_t height = CGImageGetHeight(spriteImage);
+    
+    Byte * spriteData = (Byte *) calloc(width * height * 4, sizeof(Byte)); //rgba共4个byte
+    
+    CGContextRef spriteContext = CGBitmapContextCreate(spriteData, width, height, 8, width*4,
+                                                       CGImageGetColorSpace(spriteImage), kCGImageAlphaPremultipliedLast);
+    
+    // 3在CGContextRef上绘图
+    CGContextDrawImage(spriteContext, CGRectMake(0, 0, width, height), spriteImage);
+    
+    CGContextRelease(spriteContext);
+    
+    return spriteData;
+}
+
+- (UIImage*) roation: (UIImage*) image angle: (NSInteger) angle{
+    // 纹理描述符
+    MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
+    textureDescriptor.pixelFormat = RANDER_PIXEL_FORMAT;
+    textureDescriptor.width = image.size.width;
+    textureDescriptor.height = image.size.height;
+    id<MTLTexture>  texture = [_device newTextureWithDescriptor:textureDescriptor]; // 创建纹理
+    
+    MTLRegion region = MTLRegionMake2D(0,0,textureDescriptor.width, textureDescriptor.height); // 纹理上传的范围
+    Byte *imageBytes = [self loadImage:image];
+    if (imageBytes) {
+        [texture replaceRegion:region
+                    mipmapLevel:0
+                      withBytes:imageBytes
+                    bytesPerRow:4 * image.size.width];
+        free(imageBytes);
+        imageBytes = NULL;
+    }
+    
+    id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+    
+    id<MTLTexture>  colorTexture = [_device newTextureWithDescriptor:textureDescriptor];
+    MTLRegion color_region = MTLRegionMake2D(0,0,textureDescriptor.width, textureDescriptor.height); // 纹理上传的范围
+    MTLRenderPassDescriptor *passDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
+    passDescriptor.colorAttachments[0].texture = colorTexture;
+    passDescriptor.colorAttachments[0].clearColor = MTLClearColorMake(0.0, 0.0, 0.0, 1.0);// 设置默认颜色
+    passDescriptor.colorAttachments[0].storeAction = MTLStoreActionStore;
+    passDescriptor.colorAttachments[0].loadAction = MTLLoadActionClear;
+    
+    
+    id<MTLRenderCommandEncoder> renderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:passDescriptor];
+    [renderEncoder setRenderPipelineState: _randerPipelineState]; // 设置渲染管道，以保证顶点和片元两个shader会被调用
+    
+    [renderEncoder setVertexBuffer:self.vertices
+                            offset:0
+                           atIndex:0]; // 设置顶点缓存
+
+    [renderEncoder setFragmentTexture: texture
+                              atIndex:0]; // 设置纹理
+    
+    [renderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
+                      vertexStart:0
+                      vertexCount:self.numVertices]; // 绘制
+    
+    [renderEncoder endEncoding]; // 结束
+    [commandBuffer commit];
+    [commandBuffer waitUntilCompleted];
+    
+    NSUInteger bytesPerRow = 4 * colorTexture.width;
+    NSInteger img_bytes_len = bytesPerRow * colorTexture.height;
+    //NSMutableData* imgdata = [[NSMutableData alloc] initWithLength:img_bytes_len];
+    
+    unsigned char* dest_data = (unsigned char*)malloc(img_bytes_len);
+    [colorTexture getBytes:dest_data bytesPerRow:bytesPerRow fromRegion:color_region mipmapLevel:0];
+    //NSData* imgdata = [[NSData alloc] initWithBytes:dest_data length:img_bytes_len];
+    UIImage* outimg = [self imageFromBRGABytes:dest_data imageSize:CGSizeMake(colorTexture.width, colorTexture.height)];
+    free(dest_data);
+    
+    return outimg;
+}
+
++ (UIImage *)image:(UIImage *)image rotation:(UIImageOrientation)orientation
+{
+    long double rotate = 0.0;
+    CGRect rect;
+    float translateX = 0;
+    float translateY = 0;
+    float scaleX = 1.0;
+    float scaleY = 1.0;
+    
+    switch (orientation) {
+        case UIImageOrientationLeft:
+            rotate = M_PI_2;
+            rect = CGRectMake(0, 0, image.size.height, image.size.width);
+            translateX = 0;
+            translateY = -rect.size.width;
+            scaleY = rect.size.width/rect.size.height;
+            scaleX = rect.size.height/rect.size.width;
+            break;
+        case UIImageOrientationRight:
+            rotate = 33 * M_PI_2;
+            rect = CGRectMake(0, 0, image.size.height, image.size.width);
+            translateX = -rect.size.height;
+            translateY = 0;
+            scaleY = rect.size.width/rect.size.height;
+            scaleX = rect.size.height/rect.size.width;
+            break;
+        case UIImageOrientationDown:
+            rotate = M_PI;
+            rect = CGRectMake(0, 0, image.size.width, image.size.height);
+            translateX = -rect.size.width;
+            translateY = -rect.size.height;
+            break;
+        default:
+            rotate = 0.0;
+            rect = CGRectMake(0, 0, image.size.width, image.size.height);
+            translateX = 0;
+            translateY = 0;
+            break;
+    }
+    
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    //做CTM变换
+    CGContextTranslateCTM(context, 0.0, rect.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextRotateCTM(context, rotate);
+    CGContextTranslateCTM(context, translateX, translateY);
+    
+    CGContextScaleCTM(context, scaleX, scaleY);
+    //绘制图片
+    CGContextDrawImage(context, CGRectMake(0, 0, rect.size.width, rect.size.height), image.CGImage);
+    
+    UIImage *newPic = UIGraphicsGetImageFromCurrentImageContext();
+    
+    return newPic;
 }
 
 @end

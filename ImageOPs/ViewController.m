@@ -37,7 +37,12 @@
 }
 
 - (IBAction)roationTouchUP:(id)sender {
-    
+    NSBundle* mainBundle = [NSBundle mainBundle];
+    NSString* pic = [mainBundle pathForResource:@"apple" ofType:@"jpeg"];
+    //pic = [NSString stringWithFormat:@"%@/apple.jpeg", NSHomeDirectory()];
+    UIImage* img = [UIImage imageWithContentsOfFile:pic];
+    UIImage* outimg = [[ImageMisc sharedInstance] roation:img angle:0];
+    [self.imgView setImage:outimg];
 }
 
 - (IBAction)binaryTouchUP:(id)sender {

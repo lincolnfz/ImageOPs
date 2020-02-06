@@ -105,6 +105,11 @@ float4x4 matrix_float4x4_perspective(const float &aspect, const float & fovy, co
     float4 Q = { 0, yScale, 0, 0 };
     float4 R = { 0, 0, zScale, -1 };
     float4 S = { 0, 0, wzScale, 0 };
+    
+//    float4 P = { 1, 0, 0, 0 };
+//    float4 Q = { 0, 1, 0, 0 };
+//    float4 R = { 0, 0, 1, -1 };
+//    float4 S = { 0, 0, 1, 0 };
 
     float4x4 mat = { P, Q, R, S };
     return mat;

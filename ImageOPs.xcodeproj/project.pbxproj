@@ -10,11 +10,6 @@
 		8A90D56D23EA9D0A0078D862 /* MetalContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D56C23EA9D0A0078D862 /* MetalContext.mm */; };
 		8A90D57223EA9DA00078D862 /* MathUtilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D57023EA9DA00078D862 /* MathUtilities.cpp */; };
 		8A90D57323EA9DA00078D862 /* OrbitControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D57123EA9DA00078D862 /* OrbitControl.cpp */; };
-		8A90D58323EA9E2A0078D862 /* FrameRenderer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D57823EA9E290078D862 /* FrameRenderer.mm */; };
-		8A90D58423EA9E2A0078D862 /* TextureRendererEncoder.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D57C23EA9E2A0078D862 /* TextureRendererEncoder.metal */; };
-		8A90D58523EA9E2A0078D862 /* TextureRendererEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D57E23EA9E2A0078D862 /* TextureRendererEncoder.mm */; };
-		8A90D58623EA9E2A0078D862 /* FrameRendererEncoder.metal in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D58023EA9E2A0078D862 /* FrameRendererEncoder.metal */; };
-		8A90D58723EA9E2A0078D862 /* FrameRendererEncoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8A90D58223EA9E2A0078D862 /* FrameRendererEncoder.mm */; };
 		8AFE425023E7D00B00F19A93 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AFE424F23E7D00B00F19A93 /* AppDelegate.m */; };
 		8AFE425323E7D00B00F19A93 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AFE425223E7D00B00F19A93 /* SceneDelegate.m */; };
 		8AFE425623E7D00B00F19A93 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8AFE425523E7D00B00F19A93 /* ViewController.m */; };
@@ -49,17 +44,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A455E3C23EBABA200B325BD /* LYShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LYShaderTypes.h; sourceTree = "<group>"; };
+		8A455E3D23EBB41900B325BD /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
+		8A455E3F23EBD78E00B325BD /* MathUtilities.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = MathUtilities.hpp; path = Math/MathUtilities.hpp; sourceTree = "<group>"; };
+		8A455E4023EBD79800B325BD /* OrbitControl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = OrbitControl.hpp; path = Math/OrbitControl.hpp; sourceTree = "<group>"; };
+		8A455E4123EBE38700B325BD /* ImageMisc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageMisc.h; sourceTree = "<group>"; };
 		8A90D56C23EA9D0A0078D862 /* MetalContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MetalContext.mm; path = MetalContext/MetalContext.mm; sourceTree = "<group>"; };
 		8A90D57023EA9DA00078D862 /* MathUtilities.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MathUtilities.cpp; path = Math/MathUtilities.cpp; sourceTree = "<group>"; };
 		8A90D57123EA9DA00078D862 /* OrbitControl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = OrbitControl.cpp; path = Math/OrbitControl.cpp; sourceTree = "<group>"; };
-		8A90D57823EA9E290078D862 /* FrameRenderer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FrameRenderer.mm; sourceTree = "<group>"; };
-		8A90D57923EA9E290078D862 /* FrameRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameRenderer.h; sourceTree = "<group>"; };
-		8A90D57C23EA9E2A0078D862 /* TextureRendererEncoder.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = TextureRendererEncoder.metal; sourceTree = "<group>"; };
-		8A90D57D23EA9E2A0078D862 /* TextureRendererEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureRendererEncoder.h; sourceTree = "<group>"; };
-		8A90D57E23EA9E2A0078D862 /* TextureRendererEncoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TextureRendererEncoder.mm; sourceTree = "<group>"; };
-		8A90D58023EA9E2A0078D862 /* FrameRendererEncoder.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = FrameRendererEncoder.metal; sourceTree = "<group>"; };
-		8A90D58123EA9E2A0078D862 /* FrameRendererEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameRendererEncoder.h; sourceTree = "<group>"; };
-		8A90D58223EA9E2A0078D862 /* FrameRendererEncoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FrameRendererEncoder.mm; sourceTree = "<group>"; };
 		8AFE424B23E7D00B00F19A93 /* ImageOPs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageOPs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AFE424E23E7D00B00F19A93 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		8AFE424F23E7D00B00F19A93 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -124,56 +116,12 @@
 		8A90D57523EA9DD60078D862 /* Math */ = {
 			isa = PBXGroup;
 			children = (
+				8A455E4023EBD79800B325BD /* OrbitControl.hpp */,
+				8A455E3F23EBD78E00B325BD /* MathUtilities.hpp */,
 				8A90D57023EA9DA00078D862 /* MathUtilities.cpp */,
 				8A90D57123EA9DA00078D862 /* OrbitControl.cpp */,
 			);
 			name = Math;
-			sourceTree = "<group>";
-		};
-		8A90D57623EA9E290078D862 /* MetalRenderer */ = {
-			isa = PBXGroup;
-			children = (
-				8A90D57723EA9E290078D862 /* FrameRenderer */,
-			);
-			path = MetalRenderer;
-			sourceTree = "<group>";
-		};
-		8A90D57723EA9E290078D862 /* FrameRenderer */ = {
-			isa = PBXGroup;
-			children = (
-				8A90D57823EA9E290078D862 /* FrameRenderer.mm */,
-				8A90D57923EA9E290078D862 /* FrameRenderer.h */,
-			);
-			path = FrameRenderer;
-			sourceTree = "<group>";
-		};
-		8A90D57A23EA9E2A0078D862 /* MetalEncoder */ = {
-			isa = PBXGroup;
-			children = (
-				8A90D57B23EA9E2A0078D862 /* TextureRendererEncoder */,
-				8A90D57F23EA9E2A0078D862 /* FrameRendererEncoder */,
-			);
-			path = MetalEncoder;
-			sourceTree = "<group>";
-		};
-		8A90D57B23EA9E2A0078D862 /* TextureRendererEncoder */ = {
-			isa = PBXGroup;
-			children = (
-				8A90D57C23EA9E2A0078D862 /* TextureRendererEncoder.metal */,
-				8A90D57D23EA9E2A0078D862 /* TextureRendererEncoder.h */,
-				8A90D57E23EA9E2A0078D862 /* TextureRendererEncoder.mm */,
-			);
-			path = TextureRendererEncoder;
-			sourceTree = "<group>";
-		};
-		8A90D57F23EA9E2A0078D862 /* FrameRendererEncoder */ = {
-			isa = PBXGroup;
-			children = (
-				8A90D58023EA9E2A0078D862 /* FrameRendererEncoder.metal */,
-				8A90D58123EA9E2A0078D862 /* FrameRendererEncoder.h */,
-				8A90D58223EA9E2A0078D862 /* FrameRendererEncoder.mm */,
-			);
-			path = FrameRendererEncoder;
 			sourceTree = "<group>";
 		};
 		8AFE424223E7D00B00F19A93 = {
@@ -200,11 +148,11 @@
 		8AFE424D23E7D00B00F19A93 /* ImageOPs */ = {
 			isa = PBXGroup;
 			children = (
-				8A90D57A23EA9E2A0078D862 /* MetalEncoder */,
-				8A90D57623EA9E290078D862 /* MetalRenderer */,
 				8A90D57523EA9DD60078D862 /* Math */,
 				8A90D56E23EA9D1C0078D862 /* MetalContext */,
 				8AFE428E23E7DDFE00F19A93 /* ImageMisc.mm */,
+				8A455E4123EBE38700B325BD /* ImageMisc.h */,
+				8A455E3C23EBABA200B325BD /* LYShaderTypes.h */,
 				8AFE428D23E7DDF600F19A93 /* ImageMisc.h */,
 				8AFE424E23E7D00B00F19A93 /* AppDelegate.h */,
 				8AFE424F23E7D00B00F19A93 /* AppDelegate.m */,
@@ -244,6 +192,7 @@
 		8AFE428323E7D0A500F19A93 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8A455E3D23EBB41900B325BD /* GLKit.framework */,
 				8AFE429023E803AC00F19A93 /* UIKit.framework */,
 				8AFE428423E7D0A500F19A93 /* Metal.framework */,
 			);
@@ -382,13 +331,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A90D57223EA9DA00078D862 /* MathUtilities.cpp in Sources */,
-				8A90D58423EA9E2A0078D862 /* TextureRendererEncoder.metal in Sources */,
 				8A90D57323EA9DA00078D862 /* OrbitControl.cpp in Sources */,
-				8A90D58323EA9E2A0078D862 /* FrameRenderer.mm in Sources */,
 				8A90D56D23EA9D0A0078D862 /* MetalContext.mm in Sources */,
-				8A90D58723EA9E2A0078D862 /* FrameRendererEncoder.mm in Sources */,
-				8A90D58623EA9E2A0078D862 /* FrameRendererEncoder.metal in Sources */,
-				8A90D58523EA9E2A0078D862 /* TextureRendererEncoder.mm in Sources */,
 				8AFE425623E7D00B00F19A93 /* ViewController.m in Sources */,
 				8AFE428F23E7DDFE00F19A93 /* ImageMisc.mm in Sources */,
 				8AFE425023E7D00B00F19A93 /* AppDelegate.m in Sources */,

@@ -10,12 +10,18 @@
 #define LYShaderTypes_h
 #include <simd/simd.h>
 
+
 typedef struct
 {
     vector_float4 position;
     vector_float2 textureCoordinate;
 } LYVertex;
 
+typedef struct
+{
+    matrix_float4x4 projectionMatrix;
+    matrix_float4x4 modelViewMatrix;
+} LYMatrix;
 
 
 #endif /* LYShaderTypes_h */

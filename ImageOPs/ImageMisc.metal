@@ -60,9 +60,12 @@ typedef struct
 
 vertex RasterizerData // 返回给片元着色器的结构体
 vertexShader(uint vertexID [[ vertex_id ]], // vertex_id是顶点shader每次处理的index，用于定位当前的顶点
-             constant LYVertex *vertexArray [[ buffer(0) ]]) { // buffer表明是缓存数据，0是索引
+             constant LYVertex *vertexArray [[ buffer(0) ]],
+             constant LYMatrix *matrix [[ buffer(1) ]]) {
     RasterizerData out;
-    out.clipSpacePosition = vertexArray[vertexID].position;
+    //out.clipSpacePosition = vertexArray[vertexID].position;
+    out.clipSpacePosition = matrix->projectionMatrix * vertexArray[vertexID].position;
+    //out.clipSpacePosition = matrix->projectionMatrix * matrix->modelViewMatrix * vertexArray[vertexID].position;
     out.textureCoordinate = vertexArray[vertexID].textureCoordinate;
     return out;
 }

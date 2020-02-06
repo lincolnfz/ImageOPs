@@ -10,6 +10,7 @@
 #import <Metal/Metal.h>
 #import "LYShaderTypes.h"
 #import "MetalContext/MetalContext.h"
+#import "Math/MathUtilities.hpp"
 
 @interface ImageMisc()
 @property (nonatomic, strong) id<MTLBuffer> vertices;
@@ -435,7 +436,7 @@ NSData* getImageNSData(UIImage* image){
     return spriteData;
 }
 
-- (UIImage*) roation: (UIImage*) image angle: (NSInteger) angle{
+- (UIImage*) roation: (UIImage*) image angle: (float) angle{
     // 纹理描述符
     MTLTextureDescriptor *textureDescriptor = [[MTLTextureDescriptor alloc] init];
     textureDescriptor.pixelFormat = RANDER_PIXEL_FORMAT;
@@ -454,7 +455,25 @@ NSData* getImageNSData(UIImage* image){
         imageBytes = NULL;
     }
     
+    float3 axisZ={0.0,0.0,1.0};
+    float3 a0 = {0.,0.,0.};
+    float3 a1 = {(float)texture.width,0.,0.};
+    float3 a2 = {(float)texture.height, 0.,0.};
+    float3 a3 = {(float)texture.width, (float)texture.height,0.};
+    float4x3  cord(a0, a1, a2, a3);
+    float4x4 rotationPitch=matrix_float4x4_rotation(axisZ,angle/180.0*M_PI);
+    
+    float4x4 prespecive = matrix_float4x4_perspective(0.1,1.,0.1,100.);
+    LYMatrix matrix = {rotationPitch, prespecive};
+    
+    
+    
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+    
+    if(abs(angle)-90.0<1e-3 || abs(angle)-270.0 < 1e-3){
+        textureDescriptor.width = image.size.height;
+        textureDescriptor.height = image.size.width;
+    }
     
     id<MTLTexture>  colorTexture = [_device newTextureWithDescriptor:textureDescriptor];
     MTLRegion color_region = MTLRegionMake2D(0,0,textureDescriptor.width, textureDescriptor.height); // 纹理上传的范围
@@ -471,6 +490,8 @@ NSData* getImageNSData(UIImage* image){
     [renderEncoder setVertexBuffer:self.vertices
                             offset:0
                            atIndex:0]; // 设置顶点缓存
+    
+    [renderEncoder setVertexBytes:&matrix  length:sizeof(matrix)  atIndex:1]; //设置转换矩阵
 
     [renderEncoder setFragmentTexture: texture
                               atIndex:0]; // 设置纹理
@@ -482,6 +503,7 @@ NSData* getImageNSData(UIImage* image){
     [renderEncoder endEncoding]; // 结束
     [commandBuffer commit];
     [commandBuffer waitUntilCompleted];
+    
     
     NSUInteger bytesPerRow = 4 * colorTexture.width;
     NSInteger img_bytes_len = bytesPerRow * colorTexture.height;
@@ -495,6 +517,42 @@ NSData* getImageNSData(UIImage* image){
     
     return outimg;
 }
+
+/*- (matrix_float4x4)getMetalMatrixFromGLKMatrix:(GLKMatrix4)matrix {
+    matrix_float4x4 ret = (matrix_float4x4){
+        simd_make_float4(matrix.m00, matrix.m01, matrix.m02, matrix.m03),
+        simd_make_float4(matrix.m10, matrix.m11, matrix.m12, matrix.m13),
+        simd_make_float4(matrix.m20, matrix.m21, matrix.m22, matrix.m23),
+        simd_make_float4(matrix.m30, matrix.m31, matrix.m32, matrix.m33),
+    };
+    return ret;
+}
+
+- (void)setupMatrixWithEncoder:(id<MTLRenderCommandEncoder>)renderEncoder {
+    CGSize size = self.view.bounds.size;
+    float aspect = fabs(size.width / size.height);
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(90.0), aspect, 0.1f, 10.f);
+    GLKMatrix4 modelViewMatrix = GLKMatrix4Translate(GLKMatrix4Identity, 0.0f, 0.0f, -2.0f);
+    static float x = 0.0, y = 0.0, z = M_PI;
+    if (self.rotationX.on) {
+        x += self.slider.value;
+    }
+    if (self.rotationY.on) {
+        y += self.slider.value;
+    }
+    if (self.rotationZ.on) {
+        z += self.slider.value;
+    }
+    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, x, 1, 0, 0);
+    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, y, 0, 1, 0);
+    modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, z, 0, 0, 1);
+    
+    LYMatrix matrix = {[self getMetalMatrixFromGLKMatrix:projectionMatrix], [self getMetalMatrixFromGLKMatrix:modelViewMatrix]};
+    
+    [renderEncoder setVertexBytes:&matrix
+                           length:sizeof(matrix)
+                          atIndex:LYVertexInputIndexMatrix];
+}*/
 
 + (UIImage *)image:(UIImage *)image rotation:(UIImageOrientation)orientation
 {

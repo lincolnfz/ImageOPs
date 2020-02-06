@@ -470,7 +470,7 @@ NSData* getImageNSData(UIImage* image){
     
     id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
     
-    if(abs(angle)-90.0<1e-3 || abs(angle)-270.0 < 1e-3){
+    if(abs(abs(angle)-90.0)<1e-3 || abs(abs(angle)-270.0) < 1e-3){
         textureDescriptor.width = image.size.height;
         textureDescriptor.height = image.size.width;
     }

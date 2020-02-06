@@ -41,7 +41,7 @@
     NSString* pic = [mainBundle pathForResource:@"apple" ofType:@"jpeg"];
     //pic = [NSString stringWithFormat:@"%@/apple.jpeg", NSHomeDirectory()];
     UIImage* img = [UIImage imageWithContentsOfFile:pic];
-    UIImage* outimg = [[ImageMisc sharedInstance] roation:img angle:90];
+    UIImage* outimg = [[ImageMisc sharedInstance] roation:img angle:-90];
     [self.imgView setImage:outimg];
 }
 

@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "ImageMisc.h"
+#import "CTPNOcr.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UIImageView *imgView;
@@ -52,6 +53,8 @@
     UIImage* img = [UIImage imageWithContentsOfFile:pic];
     UIImage* binImg = [[ImageMisc sharedInstance] binaryTrans:img Threshold:128];
     [self.imgView setImage:binImg];
+    
+    [CTPNOcr RunInferenceOnImage: img];
 }
 
 @end
